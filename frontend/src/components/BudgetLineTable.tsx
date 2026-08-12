@@ -6,7 +6,7 @@ interface Props {
 }
 
 function formatAmount(value: string): string {
-  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
+  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "XOF" }).format(
     Number(value),
   );
 }
@@ -24,9 +24,11 @@ export default function BudgetLineTable({ lines, onDelete }: Props) {
     <table aria-label="Lignes budgétaires">
       <thead>
         <tr>
-          <th>Catégorie</th>
+          <th>Centre de coût</th>
+          <th>Exercice</th>
           <th>Période</th>
           <th>Prévu</th>
+          <th>Réestimé</th>
           <th>Réalisé</th>
           <th>Écart</th>
           <th>Écart %</th>
@@ -38,9 +40,11 @@ export default function BudgetLineTable({ lines, onDelete }: Props) {
           const isOverBudget = Number(line.ecart_valeur) >= 0;
           return (
             <tr key={line.id}>
-              <td>{line.categorie}</td>
+              <td>{line.centre_cout.nom}</td>
+              <td>{line.exercice}</td>
               <td>{line.periode}</td>
               <td>{formatAmount(line.montant_prevu)}</td>
+              <td>{line.montant_reestime ? formatAmount(line.montant_reestime) : "N/A"}</td>
               <td>{formatAmount(line.montant_realise)}</td>
               <td className={isOverBudget ? "ecart-depassement" : "ecart-economie"}>
                 {formatAmount(line.ecart_valeur)}

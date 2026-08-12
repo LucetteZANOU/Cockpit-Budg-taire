@@ -26,10 +26,11 @@ describe("budgetLines api client", () => {
   });
 
   it("posts a new budget line", async () => {
-    const created = { id: 2, categorie: "Ventes" };
+    const created = { id: 2, centre_cout_id: 1 };
     mockFetch({ ok: true, json: () => Promise.resolve(created) });
     const result = await createBudgetLine({
-      categorie: "Ventes",
+      centre_cout_id: 1,
+      exercice: 2026,
       montant_prevu: "100",
       montant_realise: "0",
       periode: "2026-02",

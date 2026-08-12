@@ -10,17 +10,17 @@ import {
   YAxis,
 } from "recharts";
 
-import type { CategorySummary } from "../types/budgetLine";
+import type { CentreCoutSummary } from "../types/budgetLine";
 
 interface Props {
-  categories: CategorySummary[];
+  centresCout: CentreCoutSummary[];
 }
 
 const COLOR_DEPASSEMENT = "var(--diverging-positive)";
 const COLOR_ECONOMIE = "var(--diverging-negative)";
 
 interface TooltipPayloadItem {
-  payload: CategorySummary & { ecart: number };
+  payload: CentreCoutSummary & { ecart: number };
 }
 
 function ChartTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
@@ -37,7 +37,7 @@ function ChartTooltip({ active, payload }: { active?: boolean; payload?: Tooltip
         fontSize: "0.85rem",
       }}
     >
-      <strong>{data.categorie}</strong>
+      <strong>{data.centre_cout}</strong>
       <div>Prévu : {data.total_prevu}</div>
       <div>Réalisé : {data.total_realise}</div>
       <div>Écart : {data.ecart_valeur}</div>
@@ -45,12 +45,12 @@ function ChartTooltip({ active, payload }: { active?: boolean; payload?: Tooltip
   );
 }
 
-export default function VarianceChart({ categories }: Props) {
-  if (categories.length === 0) {
+export default function VarianceChart({ centresCout }: Props) {
+  if (centresCout.length === 0) {
     return <p>Pas encore de données pour le graphique.</p>;
   }
 
-  const data = categories.map((c) => ({ ...c, ecart: Number(c.ecart_valeur) }));
+  const data = centresCout.map((c) => ({ ...c, ecart: Number(c.ecart_valeur) }));
 
   return (
     <div>
@@ -67,14 +67,14 @@ export default function VarianceChart({ categories }: Props) {
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
           <CartesianGrid stroke="var(--gridline)" vertical={false} />
-          <XAxis dataKey="categorie" stroke="var(--text-muted)" tick={{ fontSize: 12 }} />
+          <XAxis dataKey="centre_cout" stroke="var(--text-muted)" tick={{ fontSize: 12 }} />
           <YAxis stroke="var(--text-muted)" tick={{ fontSize: 12 }} />
           <ReferenceLine y={0} stroke="var(--baseline)" />
           <Tooltip content={<ChartTooltip />} />
           <Bar dataKey="ecart" radius={[4, 4, 0, 0]} maxBarSize={24}>
             {data.map((entry) => (
               <Cell
-                key={entry.categorie}
+                key={entry.centre_cout}
                 fill={entry.ecart >= 0 ? COLOR_DEPASSEMENT : COLOR_ECONOMIE}
               />
             ))}
