@@ -1,6 +1,8 @@
 # BudgetRadar
 
-Dashboard de contrôle de gestion : suivi des lignes budgétaires et des écarts prévu/réalisé.
+Dashboard de suivi budgétaire pour RAF de projets/ONG financés par des bailleurs
+au Bénin : lignes budgétaires par centre de coût, écarts prévu/réestimé/réalisé.
+Le cadrage produit (cible, périmètre V1, roadmap) est dans [ROADMAP.md](./ROADMAP.md).
 
 ## Stack
 
@@ -30,11 +32,14 @@ frontend/   Application React (Vite + TypeScript)
 
 Le workflow de développement (branches, commits, revues, CI) est documenté dans [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-## Périmètre fonctionnel (MVP)
+## Périmètre fonctionnel (V1)
 
-- Saisie de lignes budgétaires (catégorie, montant prévu, montant réalisé, période)
+- Référentiel de centres de coût
+- Saisie de lignes budgétaires (centre de coût, exercice, période, prévu/réestimé/réalisé)
 - Calcul automatique des écarts (valeur et pourcentage)
-- Dashboard de synthèse avec graphique des écarts par catégorie
+- Dashboard de synthèse avec graphique des écarts par centre de coût
+
+Détail complet du cadrage (cible, hors-scope, roadmap) : [ROADMAP.md](./ROADMAP.md).
 
 ## Licence
 
