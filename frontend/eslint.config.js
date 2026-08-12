@@ -25,6 +25,9 @@ export default [
       ...tseslint.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      // TypeScript's own compiler catches undefined identifiers/types; no-undef
+      // produces false positives on ambient DOM types (RequestInit, etc.).
+      "no-undef": "off",
     },
   },
   {
