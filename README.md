@@ -35,3 +35,17 @@ Le workflow de développement (branches, commits, revues, CI) est documenté dan
 - Saisie de lignes budgétaires (catégorie, montant prévu, montant réalisé, période)
 - Calcul automatique des écarts (valeur et pourcentage)
 - Dashboard de synthèse avec graphique des écarts par catégorie
+
+## Licence
+
+BudgetRadar — Copyright (C) 2026 Princesse ZANOU
+
+Ce programme est un logiciel libre : vous pouvez le redistribuer et/ou le
+modifier selon les termes de la GNU Affero General Public License publiée
+par la Free Software Foundation, version 3 de la licence, ou (à votre
+choix) toute version ultérieure. Voir [LICENSE](./LICENSE) pour le texte
+complet.
+
+L'AGPL impose que toute personne faisant tourner une version modifiée de
+ce logiciel comme service réseau (SaaS) mette également son code source
+à disposition des utilisateurs de ce service.
