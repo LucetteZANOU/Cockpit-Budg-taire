@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session, joinedload
 
 from app.core.database import get_db
 from app.models.budget_line import BudgetLine
@@ -16,57 +17,83 @@ router = APIRouter(prefix="/api/budget-lines", tags=["budget-lines"])
 
 
 def _to_read(line: BudgetLine) -> BudgetLineRead:
+    ecart_reestime_valeur = None
+    ecart_reestime_pourcentage = None
+    if line.montant_reestime is not None:
+        ecart_reestime_valeur = compute_ecart_valeur(line.montant_prevu, line.montant_reestime)
+        ecart_reestime_pourcentage = compute_ecart_pourcentage(
+            line.montant_prevu, line.montant_reestime
+        )
+
     return BudgetLineRead(
         id=line.id,
-        categorie=line.categorie,
-        montant_prevu=line.montant_prevu,
-        montant_realise=line.montant_realise,
+        centre_cout=line.centre_cout,
+        exercice=line.exercice,
         periode=line.periode,
+        montant_prevu=line.montant_prevu,
+        montant_reestime=line.montant_reestime,
+        montant_realise=line.montant_realise,
         created_at=line.created_at,
         updated_at=line.updated_at,
         ecart_valeur=compute_ecart_valeur(line.montant_prevu, line.montant_realise),
         ecart_pourcentage=compute_ecart_pourcentage(line.montant_prevu, line.montant_realise),
+        ecart_reestime_valeur=ecart_reestime_valeur,
+        ecart_reestime_pourcentage=ecart_reestime_pourcentage,
     )
+
+
+def _select_with_centre_cout():
+    return select(BudgetLine).options(joinedload(BudgetLine.centre_cout))
 
 
 @router.post("", response_model=BudgetLineRead, status_code=201)
 def create_budget_line(payload: BudgetLineCreate, db: Session = Depends(get_db)) -> BudgetLineRead:
     line = BudgetLine(**payload.model_dump())
     db.add(line)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=422, detail="centre_cout_id invalide") from exc
     db.refresh(line)
     return _to_read(line)
 
 
 @router.get("", response_model=list[BudgetLineRead])
 def list_budget_lines(
-    categorie: str | None = None,
+    centre_cout_id: int | None = None,
+    exercice: int | None = None,
     periode: str | None = None,
     db: Session = Depends(get_db),
 ) -> list[BudgetLineRead]:
-    stmt = select(BudgetLine)
-    if categorie is not None:
-        stmt = stmt.where(BudgetLine.categorie == categorie)
+    stmt = _select_with_centre_cout()
+    if centre_cout_id is not None:
+        stmt = stmt.where(BudgetLine.centre_cout_id == centre_cout_id)
+    if exercice is not None:
+        stmt = stmt.where(BudgetLine.exercice == exercice)
     if periode is not None:
         stmt = stmt.where(BudgetLine.periode == periode)
-    lines = db.execute(stmt.order_by(BudgetLine.periode, BudgetLine.categorie)).scalars().all()
+    lines = db.execute(stmt.order_by(BudgetLine.periode)).scalars().unique().all()
     return [_to_read(line) for line in lines]
 
 
 @router.get("/summary", response_model=VarianceSummaryRead)
 def get_summary(
+    exercice: int | None = None,
     periode: str | None = None,
     db: Session = Depends(get_db),
 ) -> VarianceSummaryRead:
-    stmt = select(BudgetLine)
+    stmt = _select_with_centre_cout()
+    if exercice is not None:
+        stmt = stmt.where(BudgetLine.exercice == exercice)
     if periode is not None:
         stmt = stmt.where(BudgetLine.periode == periode)
-    lines = db.execute(stmt).scalars().all()
+    lines = db.execute(stmt).scalars().unique().all()
     return VarianceSummaryRead.model_validate(summarize_variances(lines), from_attributes=True)
 
 
 def _get_or_404(db: Session, line_id: int) -> BudgetLine:
-    line = db.get(BudgetLine, line_id)
+    line = db.execute(_select_with_centre_cout().where(BudgetLine.id == line_id)).scalars().first()
     if line is None:
         raise HTTPException(status_code=404, detail="Budget line not found")
     return line
