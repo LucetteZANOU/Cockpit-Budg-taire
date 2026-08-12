@@ -1,0 +1,15 @@
+# Un seul compte GitHub existe sur ce projet ; ce fichier documente la
+# propriété *conceptuelle* de chaque zone par rôle simulé, pas une
+# application technique multi-utilisateurs.
+
+# Lead / Architecture
+/.github/            @LucetteZANOU
+/docker-compose.yml  @LucetteZANOU
+README.md            @LucetteZANOU
+CONTRIBUTING.md       @LucetteZANOU
+
+# Data / Backend
+/backend/            @LucetteZANOU
+
+# Frontend
+/frontend/           @LucetteZANOU

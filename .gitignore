@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Env files
+.env
+!.env.example
+
+# Docker
+docker-compose.override.yml
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
